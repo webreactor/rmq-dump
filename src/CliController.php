@@ -89,10 +89,10 @@ class CliController {
         echo "Dry load to check you filters\n";
         echo "  cat dump.json | rmq-dump dryload -H host -u user -p password -v host1 -a vhost2 \n\n";
 
-        echo "Copy all messages from one queue1 to queue2 qithout storing them\n";
+        echo "Copy all messages from queue1 to queue2 qithout storing them\n";
         echo "rmq-dumper -u user -p pass -v /app/live:queue1 dump | ./rmq-dumper -u user -p pass -a :queue2 load\n\n";
 
-        echo "Copy all messages from one vhost1 to vhost2 qithout storing them. Note: all queues have exists at vhost2\n";
+        echo "Copy all messages from vhost1 to vhost2 not storing them. Note: all queues have exists at vhost2\n";
         echo "rmq-dumper -u user -p pass -v /vhost1 dump | ./rmq-dumper -u user -p pass -a /vhost2 load\n\n";
     }
 
