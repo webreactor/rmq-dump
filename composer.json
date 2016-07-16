@@ -1,0 +1,20 @@
+{
+    "name": "RMQDumper",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "RMQDumper\\": "src/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/webreactor/cli-arguments.git"
+        }
+    ],
+    "require": {
+        "symfony/yaml": "3.0.1",
+        "webreactor/cli-arguments": "dev-master",
+        "php-amqplib/php-amqplib": "*"
+    }
+}
