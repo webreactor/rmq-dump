@@ -10,7 +10,7 @@ To backup exchanges, queues, bindings use RMQ webinterface.
 ### Features
 
 * Dumps messages
-* Does not consumes messages, server state is not changed after dumping
+* Does not consume messages, server state is not changed after dumping
 * Loads messages to RMQ
 * Can filter load and dump lists of vhosts or queus
 * Can alter message changing result vhost or queue name
@@ -58,6 +58,13 @@ rmq-dump can be piped to another rmq-dump that allows copy messages qithout stor
 ### Build and Install
 
 `make && make install`
+
+or use binary
+
+```bash 
+sudo curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.1/rmq-dumper > /usr/local/bin/rmq-dumper
+chmod a+x /usr/local/bin/rmq-dumper
+```
 
 ### Usage
 
