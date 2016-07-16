@@ -7,18 +7,25 @@ Can dump messages to json file, load them back. Can modify destination vhost or 
 
 To backup exchanges, queues, bindings use RMQ webinterface.
 
+### Features
+
+* Dumps messages
+* Does not consumes messages, server state is not changed after dumping
+* Loads messages to RMQ
+* Can filter load and dump lists of vhosts or queus
+* Can alter message changing result vhost or queue name
+* Uses json lines format
+* Works with STDOUT and STDIN streams
+
 ### How it works
 
-rmq-dump does not consume messages (does not asknowleges).
+**Dumping**
 
-rmq-dump gets (basic_get) all messages then closes connections so all mesages go back to their queues.
-Tested up to 500k messages in a queue.
+rmq-dump runs throught all specified vhosts and queues (all, if not specified), using built-in rabbitmqadmin retrieves list of vhosts and queues.
+Using basic_get rmq-dump gets all messages qithout acknowledging then closes connection so all messages go back to their queues.
+Tested up to 500k messages in a queue. rmq-dump sends all recieved messages in STDOUT with json lines format. Pipe it to a file if you want to store them.
 
-rmq-dump uses STDOUT and STDIN for dumping and loading messages.
-
-rmq-dump stores all messages to json lines format.
-
-It you need consistent state backup - stop all consumers and publisher before you make backup.
+It you need consistent state backup - stop all consumers and publishers before you make backup.
 
 Each stored message contains:
 
@@ -28,23 +35,28 @@ Each stored message contains:
 - proerties
 - headers
 
-When you load them back it creates temporary exchange in order to put message to destination queue qith original routing key.
-That means in properties on loaded message original exchenge will be replaced with temporary name.
-
-All messages are sent to STDOUT so pipe it to file you want to store them.
-
 During processing the programm uses STDERR to show status.
 
-If you cake about message order do `tac dump.json > good_dump.json`. Because they stored in way for queue returned them.
+If you care about message order do `tac dump.json > good_dump.json`. Because they stored in way for queue returned them.
+
+Since it stores messages in json lines format. Use `wc -l dump.json` to get how many messages in a dump file.
+
+**Loading**
 
 Loading process expects messages from STDIN. Use examples below.
 
-Since it stores messages in json lines format. Use `wc -l dump.json` to get how many messages in the file.
+When you load them back it creates temporary exchange in order to put message to destination queue qith original routing key.
+That means in properties of loaded message original exchange will be replaced with temporary name.
+
+Loading is a good place to apply `--alter` filters that can modify destination vhost or queue name.
+
+Only specified source vhost, queue name can be loaded using `-vhost` from a big dump.
+
+rmq-dump can be piped to another rmq-dump that allows copy messages qithout storing them.
 
 ### Build and Install
 
 `make && make install`
-
 
 ### Usage
 
@@ -79,7 +91,7 @@ Load dump from big dump only specific vhost /app/prod to vhost /app/test:
 
 `cat dump.json | rmq-dump load -H host -u user -p password -v /app/prod -a /app/test`
 
-`-a or --alter` - a middleware that replaces vhost or/and queue value in a message. Can be used at dump or load process. 
+`-a or --alter` - is a middleware that replaces vhost or/and queue value in a message. Can be used at dump or load process.
 
 Copy all messages from one queue1 to queue2 qithout storing them:
 
