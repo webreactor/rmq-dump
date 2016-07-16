@@ -81,6 +81,14 @@ Load dump from big dump only specific vhost /app/prod to vhost /app/test:
 
 `-a or --alter` - a middleware that replaces vhost or/and queue value in a message. Can be used at dump or load process. 
 
+Copy all messages from one queue1 to queue2 qithout storing them:
+
+`rmq-dumper -u user -p pass -v /app/live:queue1 dump | ./rmq-dumper -u user -p pass -a :queue2 load`
+
+Copy all messages from one vhost1 to vhost2 qithout storing them. Note: all queues have exists at vhost2:
+
+`rmq-dumper -u user -p pass -v /vhost1 dump | ./rmq-dumper -u user -p pass -a /vhost2 load`
+
 List all what you have in RMQ:
 
 `rmq-dump -H host -u user -p password list`

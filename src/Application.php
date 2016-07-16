@@ -15,6 +15,10 @@ class Application {
         $vhost = null,
         $current_queue = null;
 
+    function __construct() {
+        copy(__DIR__."/rabbitmqadmin", "/tmp/rabbitmqadmin");
+        chmod("/tmp/rabbitmqadmin", 0766);
+    }
 
     function setCredentials($host, $port, $bport, $user, $pass) {
         $this->host = $host;
@@ -63,18 +67,24 @@ class Application {
         return $this->getQueueList($vhost);
     }
 
-
-    function getVhostList() {
-        copy(__DIR__."/rabbitmqadmin", "/tmp/rabbitmqadmin");
-        chmod("/tmp/rabbitmqadmin", 0766);
+    function rmqAdminCall($command) {
         $json = shell_exec("/tmp/rabbitmqadmin ".
             "-u '{$this->user}' ".
             "--password='{$this->pass}' ".
             "-H {$this->host} ".
             "-P '{$this->port}' ".
-            "-f raw_json list vhosts"
+            "-f raw_json $command"
         );
         $list = json_decode($json, true);
+        if ($list === null) {
+            throw new \Exception($json, 1);
+        }
+        return $list;
+    }
+
+
+    function getVhostList() {
+        $list = $this->rmqAdminCall("list vhosts");
         $data = array();
         foreach ($list as $key => $value) {
             $data[] = $value['name'];
@@ -83,17 +93,7 @@ class Application {
     }
 
     function getExchangeList() {
-        copy(__DIR__."/rabbitmqadmin", "/tmp/rabbitmqadmin");
-        chmod("/tmp/rabbitmqadmin", 0766);
-        $json = shell_exec("/tmp/rabbitmqadmin ".
-            "-u '{$this->user}' ".
-            "--password='{$this->pass}' ".
-            "-H {$this->host} ".
-            "-P '{$this->port}' ".
-            "-V '{$this->vhost}' ".
-            "-f raw_json list exchanges name"
-        );
-        $list = json_decode($json, true);
+        $list = $this->rmqAdminCall("list exchanges name");
         $data = array();
         foreach ($list as $key => $value) {
             $data[$value['name']] = $value['name'];
@@ -102,17 +102,7 @@ class Application {
     }
 
     function getQueueList($vhost) {
-        copy(__DIR__."/rabbitmqadmin", "/tmp/rabbitmqadmin");
-        chmod("/tmp/rabbitmqadmin", 0766);
-        $json = shell_exec("/tmp/rabbitmqadmin ".
-            "-u '{$this->user}' ".
-            "--password='{$this->pass}' ".
-            "-H {$this->host} ".
-            "-P '{$this->port}' ".
-            "-V '{$this->vhost}' ".
-            "-f raw_json list queues"
-        );
-        $list = json_decode($json, true);
+        $list = $this->rmqAdminCall("list queues");
         $data = array();
         foreach ($list as $key => $value) {
             if ($value['vhost'] === $vhost) {

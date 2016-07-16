@@ -29,6 +29,8 @@ class CliController {
                 call_user_method_array($command_handler, $this, []);
             } catch (\PhpAmqpLib\Exception\AMQPProtocolChannelException $e) {
                 fwrite(STDERR, $e->getMessage()."\n");
+            } catch (\Exception $e) {
+                fwrite(STDERR, $e->getMessage()."\n");
             }
         } else {
             $this->commandHelp();
@@ -87,9 +89,11 @@ class CliController {
         echo "Dry load to check you filters\n";
         echo "  cat dump.json | rmq-dump dryload -H host -u user -p password -v host1 -a vhost2 \n\n";
 
+        echo "Copy all messages from one queue1 to queue2 qithout storing them\n";
+        echo "rmq-dumper -u user -p pass -v /app/live:queue1 dump | ./rmq-dumper -u user -p pass -a :queue2 load\n\n";
 
-
-
+        echo "Copy all messages from one vhost1 to vhost2 qithout storing them. Note: all queues have exists at vhost2\n";
+        echo "rmq-dumper -u user -p pass -v /vhost1 dump | ./rmq-dumper -u user -p pass -a /vhost2 load\n\n";
     }
 
     function commandList() {
@@ -167,7 +171,6 @@ class CliController {
             echo json_encode($this->alterMessage($message, $to_alter))."\n";
             $cnt_total++;
             fwrite(STDERR, "    $queue $cnt_total of $expected\r");
-            // usleep(100000);
         }
         fwrite(STDERR, "    $queue $cnt_total of $expected\n");
         return $cnt_total;
@@ -178,7 +181,6 @@ class CliController {
     }
 
     function commandLoad($_dry_run = false) {
-        $stdin = fopen('php://stdin', 'r');
         $cnt_total = $cnt = 0;
         $filters = $this->arguments->getAll();
         $queue = $vhost = null;
@@ -186,7 +188,7 @@ class CliController {
         $to_skip = $this->parseVhostsArg($this->arguments->get('skip'));
         $to_alter = $this->parseAlternation($this->arguments->get('alter'));
         $this->printAlter($to_alter);
-        while ($t = fgets($stdin)) {
+        while ($t = fgets(STDIN)) {
             $message = json_decode($t, true);
             if ($this->matchVhostQueue($message['vhost'], $message['queue'], $to_dump, true) && !$this->matchVhostQueue($message['vhost'], $message['queue'], $to_skip)) {
                 $message = $this->alterMessage($message, $to_alter);
@@ -205,7 +207,6 @@ class CliController {
                     $cnt = 0;
                 }
                 echo "    $queue $cnt\r";
-
                 $cnt++;
                 $cnt_total++;
             }
@@ -214,7 +215,6 @@ class CliController {
             echo "    $queue $cnt\n";
         }
         echo "Total: $cnt_total\n";
-        fclose($stdin);
         $this->app->close();
     }
 
