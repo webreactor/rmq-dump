@@ -16,6 +16,7 @@ To backup exchanges, queues, bindings use RMQ webinterface.
 * Can alter message changing result vhost or queue name
 * Uses json lines format
 * Works with STDOUT and STDIN streams
+* Has dry run option
 
 ### How it works
 
