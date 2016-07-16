@@ -39,7 +39,7 @@ class CliController {
 
     function commandHelp() {
 
-        echo "RabbitMQ messages backup tool\n\n";
+        echo "RabbitMQ messages backup tool version ".$this->app->version."\n\n";
 
         echo "  Can dump messages to json file, load them back. Can modify destination vhost or queue name.\n";
         echo "  To backup exchanges, queues, bindings use RMQ webinterface.\n\n";

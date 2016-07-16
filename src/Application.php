@@ -13,7 +13,8 @@ class Application {
     public
         $exchange = '_dumper_temp',
         $vhost = null,
-        $current_queue = null;
+        $current_queue = null,
+        $version = '0.0.1';
 
     function __construct() {
         copy(__DIR__."/rabbitmqadmin", "/tmp/rabbitmqadmin");
