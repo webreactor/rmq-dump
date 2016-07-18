@@ -62,8 +62,8 @@ rmq-dump can be piped to another rmq-dump that allows copy messages qithout stor
 or use binary
 
 ```bash 
-curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.1/rmq-dumper > /usr/local/bin/rmq-dumper
-chmod a+x /usr/local/bin/rmq-dumper
+curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.1/rmq-dump > /usr/local/bin/rmq-dump
+chmod a+x /usr/local/bin/rmq-dump
 ```
 
 ### Usage
@@ -103,11 +103,11 @@ Load dump from big dump only specific vhost /app/prod to vhost /app/test:
 
 Copy all messages from one queue1 to queue2 qithout storing them:
 
-`rmq-dumper -u user -p pass -v /app/live:queue1 dump | ./rmq-dumper -u user -p pass -a :queue2 load`
+`rmq-dump -u user -p pass -v /app/live:queue1 dump | ./rmq-dump -u user -p pass -a :queue2 load`
 
 Copy all messages from vhost1 to vhost2 not storing them. Note: all queues have exists at vhost2:
 
-`rmq-dumper -u user -p pass -v /vhost1 dump | ./rmq-dumper -u user -p pass -a /vhost2 load`
+`rmq-dump -u user -p pass -v /vhost1 dump | ./rmq-dump -u user -p pass -a /vhost2 load`
 
 List all what you have in RMQ:
 

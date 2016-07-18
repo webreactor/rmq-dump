@@ -1,4 +1,4 @@
-BINARY=rmq-dumper
+BINARY=rmq-dump
 #=======================================================
 
 build: vendor
