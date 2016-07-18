@@ -192,9 +192,7 @@ class CliController {
             $message = json_decode($t, true);
             if ($this->matchVhostQueue($message['vhost'], $message['queue'], $to_dump, true) && !$this->matchVhostQueue($message['vhost'], $message['queue'], $to_skip)) {
                 $message = $this->alterMessage($message, $to_alter);
-                if (!$_dry_run) {
-                    $this->app->loadMessage($message);
-                }
+                $this->app->loadMessage($message, $_dry_run);
                 if ($queue != $message['queue'] || $vhost != $message['vhost']) {
                     if ($queue !== null) {
                         echo "    $queue $cnt\n";

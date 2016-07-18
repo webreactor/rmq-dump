@@ -161,13 +161,18 @@ class Application {
         $this->current_queue = $queue;
     }
 
-    function loadMessage($message_data) {
-        $this->connectVhost($message_data['vhost'], true);
+    function loadMessage($message_data, $dry_run = false) {
+        $queues = $this->connectVhost($message_data['vhost'], true);
+        if (!isset($queues[$message_data['queue']])) {
+            throw new \Exception("Queue does not exist {$message_data['vhost']}:{$message_data['queue']}", 1);
+        }
         $this->configureExhangeWith($message_data['queue']);
         $msg = new AMQPMessage($message_data['body'], $message_data['properties']);
         $headers = new AMQPTable($message_data['headers']);
         $msg->set('application_headers', $headers);
-        $this->channel->basic_publish($msg, $this->exchange, $message_data['routing_key']);
+        if (!$dry_run) {
+            $this->channel->basic_publish($msg, $this->exchange, $message_data['routing_key']);
+        }
     }
 
 }
