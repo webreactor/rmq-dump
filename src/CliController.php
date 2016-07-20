@@ -29,8 +29,10 @@ class CliController {
                 call_user_method_array($command_handler, $this, []);
             } catch (\PhpAmqpLib\Exception\AMQPProtocolChannelException $e) {
                 fwrite(STDERR, $e->getMessage()."\n");
+                exit(1);
             } catch (\Exception $e) {
                 fwrite(STDERR, $e->getMessage()."\n");
+                exit(1);
             }
         } else {
             $this->commandHelp();
