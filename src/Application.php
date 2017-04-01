@@ -14,9 +14,11 @@ class Application {
         $exchange = '_dumper_temp',
         $vhost = null,
         $current_queue = null,
-        $version = '0.0.1';
+        $version = '0.0.2',
+        $queue_list;
 
     function __construct() {
+        $this->queue_list = array();
         copy(__DIR__."/rabbitmqadmin", "/tmp/rabbitmqadmin");
         chmod("/tmp/rabbitmqadmin", 0766);
     }
@@ -47,7 +49,7 @@ class Application {
 
     function connectVhost($vhost, $temp_exchange = false) {
         if ($this->vhost === $vhost) {
-            return;
+            return $this->getQueueList($vhost);
         }
         $this->close($temp_exchange);
         $this->vhost = $vhost;
@@ -103,6 +105,9 @@ class Application {
     }
 
     function getQueueList($vhost) {
+        if (isset($this->queue_list[$vhost])) {
+            return $this->queue_list[$vhost];
+        }
         $list = $this->rmqAdminCall("list queues");
         $data = array();
         foreach ($list as $key => $value) {
@@ -110,6 +115,7 @@ class Application {
                 $data[$value['name']] = isset($value['messages'])?$value['messages']:0;
             }
         }
+        $this->queue_list[$vhost] = $data;
         return $data;
     }
 
