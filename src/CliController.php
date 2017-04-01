@@ -215,7 +215,7 @@ class CliController {
             echo "    $queue $cnt\n";
         }
         echo "Total: $cnt_total\n";
-        $this->app->close();
+        $this->app->close(true);
     }
 
     function alterMessage($message, $alters) {
