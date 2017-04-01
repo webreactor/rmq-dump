@@ -52,7 +52,7 @@ class CliController {
         echo "Commands:\n";
         echo "  dump - dumps messages from RMQ to STDOUT\n";
         echo "  load - loads messages from STDIN to RMQ\n";
-        echo "  dryload - Dry run load will show how -v -s -a optionas will affest messages\n";
+        echo "  dryload - Dry run load will show how -v -s -a optionas will affect messages\n";
         echo "  list - shows current state in RMQ with -v -s filters. Use as dry run for load\n";
         echo "  help - prints help\n\n";
 
