@@ -127,9 +127,9 @@ class Application {
         }
     }
 
-    function dumpQueue($queue_name) {
-        return new CallbackStream(function () use ($queue_name) {
-            $msg = $this->channel->basic_get($queue_name, false);
+    function dumpQueue($queue_name, $ack) {
+        return new CallbackStream(function () use ($queue_name, $ack) {
+            $msg = $this->channel->basic_get($queue_name, $ack);
             return $this->messageHandler($msg, $queue_name);
         });
     }

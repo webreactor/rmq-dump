@@ -62,12 +62,21 @@ class CliController {
 
         foreach ($this->arguments->definitions as $key => $definition) {
             if ($key != '_words_') {
-                echo sprintf("  --%-12s -%-6s %-20s %s\n",
-                    $definition->name,
-                    $definition->short,
-                    $definition->default,
-                    $definition->description
-                );
+                if (!$definition->is_flag) {
+                    echo sprintf("  --%-12s -%-6s %-20s %s\n",
+                        $definition->name,
+                        $definition->short,
+                        $definition->default,
+                        $definition->description
+                    );
+                } else {
+                    echo sprintf("  --%-12s -%-6s %-20s %s\n",
+                        $definition->name,
+                        $definition->short,
+                        'false',
+                        $definition->description
+                    );
+                }
             }
         }
         echo "\n";
@@ -128,16 +137,18 @@ class CliController {
         $to_dump = $this->parseVhostsArg($this->arguments->get('vhost'));
         $to_skip = $this->parseVhostsArg($this->arguments->get('skip'));
         $to_alter = $this->parseAlternation($this->arguments->get('alter'));
+        $ack = ($this->arguments->get('ack') == 'true');
+        fwrite(STDERR, "Dumping with ack ".($ack?'true':'false')." \n");
         $cnt_total = 0;
         $this->printAlter($to_alter);
         foreach ($this->app->getVhostList() as $vhost) {
-            $cnt_total += $this->dumpVhost($vhost, $to_dump, $to_skip, $to_alter);
+            $cnt_total += $this->dumpVhost($vhost, $to_dump, $to_skip, $to_alter, $ack);
         }
         fwrite(STDERR, "Total: $cnt_total\n");
         $this->app->close();
     }
 
-    function dumpVhost($vhost, $to_dump, $to_skip, $to_alter) {
+    function dumpVhost($vhost, $to_dump, $to_skip, $to_alter, $ack) {
         if ($this->matchVhostQueue($vhost, null, $to_skip) || !$this->matchVhostQueue($vhost, null, $to_dump, true)) {
             return 0;
         }
@@ -152,7 +163,7 @@ class CliController {
                 } elseif (!($size > 0)) {
                     fwrite(STDERR, "    $queue empty\n");
                 } else {
-                    $cnt_total += $this->dumpQueue($queue, $size, $to_alter);
+                    $cnt_total += $this->dumpQueue($queue, $size, $to_alter, $ack);
                 }
             }
         }
@@ -167,9 +178,9 @@ class CliController {
         }
     }
 
-    function dumpQueue($queue, $expected, $to_alter) {
+    function dumpQueue($queue, $expected, $to_alter, $ack) {
         $cnt_total = 0;
-        foreach ($this->app->dumpQueue($queue) as $key => $message) {
+        foreach ($this->app->dumpQueue($queue, $ack) as $key => $message) {
             echo json_encode($this->alterMessage($message, $to_alter))."\n";
             $cnt_total++;
             fwrite(STDERR, "    $queue $cnt_total of $expected\r");
