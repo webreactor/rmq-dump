@@ -26,7 +26,7 @@ class CliController {
                 $arguments->get('pass')
             );
             try {
-                call_user_method_array($command_handler, $this, []);
+                call_user_func_array(array($this, $command_handler), []);
             } catch (\PhpAmqpLib\Exception\AMQPProtocolChannelException $e) {
                 fwrite(STDERR, $e->getMessage()."\n");
                 exit(1);
