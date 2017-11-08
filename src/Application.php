@@ -14,7 +14,7 @@ class Application {
         $exchange = '_dumper_temp',
         $vhost = null,
         $current_queue = null,
-        $version = '0.0.2',
+        $version = '0.0.3',
         $queue_list;
 
     function __construct() {
