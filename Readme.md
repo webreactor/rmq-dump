@@ -62,7 +62,7 @@ rmq-dump can be piped to another rmq-dump that allows copy messages qithout stor
 or use binary
 
 ```bash 
-curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.2/rmq-dump > /usr/local/bin/rmq-dump
+curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.3/rmq-dump > /usr/local/bin/rmq-dump
 chmod a+x /usr/local/bin/rmq-dump
 ```
 
