@@ -11,7 +11,7 @@ To backup exchanges, queues, bindings use RMQ webinterface.
 
 * Dumps messages
 * Does not consume messages, server state is not changed after dumping
-* Loads messages to RMQ
+* Loads messages to RabbitMQ
 * Can filter load and dump lists of vhosts or queus
 * Can alter message changing result vhost or queue name
 * Uses json lines format
@@ -72,11 +72,11 @@ chmod a+x /usr/local/bin/rmq-dump
 
 Commands:
 
-- dump - dumps messages from RMQ to STDOUT
-- load - loads messages from STDIN to RMQ
-- dryload - Dry run load will show how -v -s -a optionas will affest messages
-- list - shows current state in RMQ with -v -s filters. Use as dry run for load
-- help - prints help
+- `dump`: dumps messages from RMQ to STDOUT
+- `load`: loads messages from STDIN to RMQ
+- `dryload`: dry run load will show how `-v`, `-s` and `-a` options will affect messages
+- `list`: shows current state in RabbitMQ with -v -s filters. Use as dry run for load
+- `help`: prints help
 
 
 Make dump all messages of all vhosts:
