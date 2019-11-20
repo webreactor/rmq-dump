@@ -25,6 +25,7 @@ class CliController {
                 $arguments->get('user'),
                 $arguments->get('pass')
             );
+            $this->app->auto_declare = ($arguments->get('declare') == true);
             try {
                 call_user_func_array(array($this, $command_handler), []);
             } catch (\PhpAmqpLib\Exception\AMQPProtocolChannelException $e) {
@@ -53,7 +54,7 @@ class CliController {
         echo "  dump - dumps messages from RMQ to STDOUT\n";
         echo "  load - loads messages from STDIN to RMQ\n";
         echo "  dryload - Dry run load will show how -v -s -a optionas will affect messages\n";
-        echo "  list - shows current state in RMQ with -v -s filters. Use as dry run for load\n";
+        echo "  list - shows current state in RMQ with -v -s filters. Use as dry run for dump\n";
         echo "  help - prints help\n\n";
 
         echo "Arguments:\n";
@@ -91,8 +92,8 @@ class CliController {
         echo "Load dump:\n";
         echo "  cat dump.json | rmq-dump load -H host -u user -p password \n\n";
 
-        echo "Load to vhost1:\n";
-        echo "  cat dump.json | rmq-dump load -H host -u user -p password -a vhost1 \n\n";
+        echo "Load to vhost1 and create queues if needed:\n";
+        echo "  cat dump.json | rmq-dump load -H host -u user -p password -d -a vhost1 \n\n";
 
         echo "Load only messages from vhost1 to vhost2:\n";
         echo "  cat dump.json | rmq-dump load -H host -u user -p password -v host1 -a vhost2 \n\n";
@@ -137,7 +138,7 @@ class CliController {
         $to_dump = $this->parseVhostsArg($this->arguments->get('vhost'));
         $to_skip = $this->parseVhostsArg($this->arguments->get('skip'));
         $to_alter = $this->parseAlternation($this->arguments->get('alter'));
-        $ack = ($this->arguments->get('ack') == 'true');
+        $ack = ($this->arguments->get('ack') == true);
         fwrite(STDERR, "Dumping with ack ".($ack?'true':'false')." \n");
         $cnt_total = 0;
         $this->printAlter($to_alter);
@@ -174,7 +175,7 @@ class CliController {
         foreach($alters as $alternation) {
             $src = $alternation['source'];
             $dst = $alternation['destination'];
-            fwrite(STDERR, "Alternation:  {$src['vhost']}:{$src['queue']}~{$dst['vhost']}:{$dst['queue']}\n");
+            fwrite(STDERR, "Alternation:  {$src['vhost']}:{$src['queue']} to {$dst['vhost']}:{$dst['queue']}\n");
         }
     }
 
@@ -329,6 +330,5 @@ class CliController {
         }
         return false;
     }
-
 
 }

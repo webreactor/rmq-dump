@@ -33,7 +33,7 @@ Each stored message contains:
 - vhost
 - queue
 - body
-- proerties
+- properties
 - headers
 
 During processing the programm uses STDERR to show status.
@@ -62,7 +62,7 @@ rmq-dump can be piped to another rmq-dump that allows copy messages qithout stor
 or use binary
 
 ```bash 
-curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.3/rmq-dump > /usr/local/bin/rmq-dump
+curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.4/rmq-dump > /usr/local/bin/rmq-dump
 chmod a+x /usr/local/bin/rmq-dump
 ```
 
@@ -75,7 +75,7 @@ Commands:
 - dump - dumps messages from RMQ to STDOUT
 - load - loads messages from STDIN to RMQ
 - dryload - Dry run load will show how -v -s -a optionas will affest messages
-- list - shows current state in RMQ with -v -s filters. Use as dry run for load
+- list - shows current state in RMQ with -v -s filters. Use as dry run for dump
 - help - prints help
 
 
@@ -91,9 +91,9 @@ Load dump:
 
 `cat dump.json | rmq-dump load -H host -u user -p password`
 
-Load dump to vhost /app/test:
+Load dump to vhost /app/test and create queues if needed:
 
-`cat dump.json | rmq-dump load -H host -u user -p password -a /app/test`
+`cat dump.json | rmq-dump load -H host -u user -p password -d -a /app/test`
 
 Load dump from big dump only specific vhost /app/prod to vhost /app/test:
 
