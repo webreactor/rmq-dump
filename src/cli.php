@@ -19,7 +19,8 @@ $argumets->addDefinition(new ArgumentDefinition('pass', 'p'));
 $argumets->addDefinition(new ArgumentDefinition('vhost', 'v', null, false, true, 'vhost[:queue] | :queue'));
 $argumets->addDefinition(new ArgumentDefinition('skip', 's', null, false, true, 'vhost[:queue] | :queue'));
 $argumets->addDefinition(new ArgumentDefinition('alter', 'a', null, false, true, 'vhost[:queue]~vhost[:queue] | vhost[:queue]'));
-$argumets->addDefinition(new ArgumentDefinition('ack', 'd', 'false', false, false, 'acknowlege (delete) messages when dump'));
+$argumets->addDefinition(new ArgumentDefinition('ack', 'k', true, true, false, 'acknowlege (delete) messages when dump'));
+$argumets->addDefinition(new ArgumentDefinition('declare', 'd', true, true, false, 'declare persistent queues when load'));
 $argumets->parse();
 
 $app = new Application();

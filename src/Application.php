@@ -14,13 +14,11 @@ class Application {
         $exchange = '_dumper_temp',
         $vhost = null,
         $current_queue = null,
-        $version = '0.0.3',
+        $version = '0.0.4',
         $queue_list;
 
     function __construct() {
         $this->queue_list = array();
-        copy(__DIR__."/rabbitmqadmin", "/tmp/rabbitmqadmin");
-        chmod("/tmp/rabbitmqadmin", 0766);
     }
 
     function setCredentials($host, $port, $bport, $user, $pass) {
@@ -61,6 +59,7 @@ class Application {
             $vhost
         );
         $this->channel = $this->connection->channel();
+        $this->channel->basic_qos(0, 10, false);
         if ($temp_exchange) {
             try {
                 $this->channel->exchange_delete($this->exchange);
@@ -70,16 +69,18 @@ class Application {
         return $this->getQueueList($vhost);
     }
 
-    function rmqAdminCall($command) {
-        $json = shell_exec("/tmp/rabbitmqadmin ".
-            "-u '{$this->user}' ".
-            "--password='{$this->pass}' ".
-            "-H {$this->host} ".
-            "-P '{$this->port}' ".
-            "-f raw_json $command"
+    function rmqAPICall($command) {
+        $command = array_map('rawurlencode', (array)$command);
+        $command = implode('/', $command);
+        $json = file_get_contents(
+            'http://'.
+            rawurlencode($this->user).':'.
+            rawurlencode($this->pass).
+            '@'.$this->host.':'.$this->port.'/api/'.
+            $command
         );
         $list = json_decode($json, true);
-        if ($list === null) {
+        if (empty($list) || isset($list['error'])) {
             throw new \Exception($json, 1);
         }
         return $list;
@@ -87,19 +88,10 @@ class Application {
 
 
     function getVhostList() {
-        $list = $this->rmqAdminCall("list vhosts");
+        $list = $this->rmqAPICall("vhosts");
         $data = array();
         foreach ($list as $key => $value) {
             $data[] = $value['name'];
-        }
-        return $data;
-    }
-
-    function getExchangeList() {
-        $list = $this->rmqAdminCall("list exchanges name");
-        $data = array();
-        foreach ($list as $key => $value) {
-            $data[$value['name']] = $value['name'];
         }
         return $data;
     }
@@ -108,23 +100,15 @@ class Application {
         if (isset($this->queue_list[$vhost])) {
             return $this->queue_list[$vhost];
         }
-        $list = $this->rmqAdminCall("list queues");
+        $list = $this->rmqAPICall("queues");
         $data = array();
         foreach ($list as $key => $value) {
             if ($value['vhost'] === $vhost) {
-                $data[$value['name']] = isset($value['messages'])?$value['messages']:0;
+                $data[$value['name']] = $value['messages'];
             }
         }
         $this->queue_list[$vhost] = $data;
         return $data;
-    }
-
-    function dumpVhost($vhost_name) {
-        $this->connectVhost($vhost_name);
-        $queues = $this->getQueueList($vhost_name);
-        foreach ($queues as $queue => $count) {
-            $this->dumpQueue($queue);
-        }
     }
 
     function dumpQueue($queue_name, $ack) {
@@ -163,20 +147,29 @@ class Application {
         if ($this->current_queue !== null) {
             $this->channel->queue_unbind($this->current_queue, $this->exchange);
         }
+        if ($this->auto_declare) {
+            $this->channel->queue_declare(
+                $queue,
+                false, //passive
+                true, //durable
+                false, //exclusive
+                false //autodelete
+            );
+        }
         $this->channel->queue_bind($queue, $this->exchange);
         $this->current_queue = $queue;
     }
 
     function loadMessage($message_data, $dry_run = false) {
         $queues = $this->connectVhost($message_data['vhost'], true);
-        if (!isset($queues[$message_data['queue']])) {
-            throw new \Exception("Queue does not exist {$message_data['vhost']}:{$message_data['queue']}", 1);
+        if (!isset($queues[$message_data['queue']]) && !$this->auto_declare) {
+            throw new \Exception("Missing queue: {$message_data['vhost']}:{$message_data['queue']}. Try add --declare", 1);
         }
-        $this->configureExhangeWith($message_data['queue']);
-        $msg = new AMQPMessage($message_data['body'], $message_data['properties']);
-        $headers = new AMQPTable($message_data['headers']);
-        $msg->set('application_headers', $headers);
         if (!$dry_run) {
+            $this->configureExhangeWith($message_data['queue'], $dry_run);
+            $msg = new AMQPMessage($message_data['body'], $message_data['properties']);
+            $headers = new AMQPTable($message_data['headers']);
+            $msg->set('application_headers', $headers);
             $this->channel->basic_publish($msg, $this->exchange, $message_data['routing_key']);
         }
     }
