@@ -22,7 +22,7 @@ To backup exchanges, queues, bindings use RMQ webinterface.
 
 **Dumping**
 
-rmq-dump runs throught all specified vhosts and queues (all, if not specified), using built-in rabbitmqadmin retrieves list of vhosts and queues.
+rmq-dump runs throught all specified vhosts and queues (all, if not specified), using HTTP API retrieves list of vhosts and queues.
 Using basic_get rmq-dump gets all messages qithout acknowledging then closes connection so all messages go back to their queues.
 Tested up to 500k messages in a queue. rmq-dump sends all recieved messages in STDOUT with json lines format. Pipe it to a file if you want to store them.
 
