@@ -16,53 +16,23 @@ RabbitMQ messages backup tool
 
 To backup exchanges, queues and bindings use RMQ webinterface - use RMQ web interface or rabbitmqadmin for it.
 
-### How it works
+### Install
 
-**Dumping**
-
-rmq-dump runs throught all specified vhosts and queues (all, if not specified).
-Using basic_get rmq-dump gets all messages qithout acknowledging then closes connection so all messages go back to their queues.
-Tested up to 500k messages in a queue. rmq-dump sends all recieved messages in STDOUT using json lines format. Pipe it to a file if you want to store them.
-
-It you need consistent state backup - stop all consumers and publishers before you make backup.
-
-Each stored message contains:
-
-- vhost
-- queue
-- body
-- properties
-- headers
-
-During processing the programm uses STDERR to show status.
-
-If you care about message order do `tac dump.json > good_dump.json`. Because they stored in way for queue returned them.
-
-Since it stores messages in json lines format. Use `wc -l dump.json` to get how many messages in a dump file.
-
-**Loading**
-
-Loading process expects messages from STDIN. Use examples below.
-
-When you load them back it creates temporary exchange in order to put message to destination queue qith original routing key.
-That means in properties of loaded message original exchange will be replaced with temporary name.
-
-Loading is a good place to apply `--alter` filters that can modify destination vhost or queue name.
-
-Only specified source vhost, queue name can be loaded using `-vhost` from a big dump.
-
-rmq-dump can be piped to another rmq-dump that allows copy messages qithout storing them.
-
-### Build and Install
-
-`make && make install`
-
-or use binary
-
-```bash 
+Linux, MacOS:
+```bash
+# You need installed php
 curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.4/rmq-dump > /usr/local/bin/rmq-dump
 chmod a+x /usr/local/bin/rmq-dump
 ```
+
+Windows:
+1. Download compiled php script from [releases](https://github.com/webreactor/rmq-dump/releases/)
+2. [Install php](https://windows.php.net/download/)
+3. Create `rmq-dump.bat` in the same folder with rmq-dump:
+```bat
+@php "%~dp0rmq-dump" %*
+```
+4. Make it available in PATH. Or install to same folder with php.exe
 
 ### Usage
 
@@ -135,4 +105,46 @@ Arguments:
 
 `--vhost` `--skip` `--alter` can be used miltiple times
 
+### How it works
 
+**Dumping**
+
+rmq-dump runs throught all specified vhosts and queues (all, if not specified).
+Using basic_get rmq-dump gets all messages qithout acknowledging then closes connection so all messages go back to their queues.
+Tested up to 500k messages in a queue. rmq-dump sends all recieved messages in STDOUT using json lines format. Pipe it to a file if you want to store them.
+
+It you need consistent state backup - stop all consumers and publishers before you make backup.
+
+Each stored message contains:
+
+- vhost
+- queue
+- body
+- properties
+- headers
+
+During processing the programm uses STDERR to show status.
+
+If you care about message order do `tac dump.json > good_dump.json`. Because they stored in way for queue returned them.
+
+Since it stores messages in json lines format. Use `wc -l dump.json` to get how many messages in a dump file.
+
+**Loading**
+
+Loading process expects messages from STDIN. Use examples below.
+
+When you load them back it creates temporary exchange in order to put message to destination queue qith original routing key.
+That means in properties of loaded message original exchange will be replaced with temporary name.
+
+Loading is a good place to apply `--alter` filters that can modify destination vhost or queue name.
+
+Only specified source vhost, queue name can be loaded using `-vhost` from a big dump.
+
+rmq-dump can be piped to another rmq-dump that allows copy messages qithout storing them.
+
+
+### Build your own and install
+
+```bash
+make && make install
+```
