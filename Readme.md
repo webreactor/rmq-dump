@@ -1,30 +1,27 @@
 RabbitMQ messages backup tool
 =============================
 
-Can dump messages to json file, load them back. Can modify destination vhost or queue name.
-
-**It dumps and loads only messages**
-
-To backup exchanges, queues, bindings use RMQ webinterface.
-
 ### Features
 
-* Dumps messages
-* Does not consume messages, server state is not changed after dumping
-* Loads messages to RabbitMQ
-* Can filter load and dump lists of vhosts or queus
-* Can alter message changing result vhost or queue name
-* Uses json lines format
-* Works with STDOUT and STDIN streams
-* Has dry run option
+- Dump messages from RabbitMQ
+- Load messages to RabbitMQ
+- Carefully keep a message routing key, body, headers
+- By default will not consume messages. Server state is not changed after dumping.
+- Dump all messages from whole RMQ server or specific vhost or a queue
+- Alter messages vhost or queue name during dump or load
+- Load from a dump only specified vhosts or queues
+- Work with STDOUT and STDIN streams using json lines format
+- Dry run option
+
+To backup exchanges, queues and bindings use RMQ webinterface - use RMQ web interface or rabbitmqadmin for it.
 
 ### How it works
 
 **Dumping**
 
-rmq-dump runs throught all specified vhosts and queues (all, if not specified), using HTTP API retrieves list of vhosts and queues.
+rmq-dump runs throught all specified vhosts and queues (all, if not specified).
 Using basic_get rmq-dump gets all messages qithout acknowledging then closes connection so all messages go back to their queues.
-Tested up to 500k messages in a queue. rmq-dump sends all recieved messages in STDOUT with json lines format. Pipe it to a file if you want to store them.
+Tested up to 500k messages in a queue. rmq-dump sends all recieved messages in STDOUT using json lines format. Pipe it to a file if you want to store them.
 
 It you need consistent state backup - stop all consumers and publishers before you make backup.
 
@@ -72,8 +69,8 @@ chmod a+x /usr/local/bin/rmq-dump
 
 Commands:
 
-- `dump`: dumps messages from RMQ to STDOUT
-- `load`: loads messages from STDIN to RMQ
+- `dump`: dumps messages from rabbitmq to STDOUT
+- `load`: loads messages from STDIN to rabbitmq
 - `dryload`: dry run load will show how `-v`, `-s` and `-a` options will affect messages
 - `list`: shows current state in RabbitMQ with -v -s filters. Use as dry run for dump
 - `help`: prints help
