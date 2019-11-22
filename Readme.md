@@ -3,15 +3,16 @@ RabbitMQ messages backup tool
 
 ### Features
 
-- Dump messages from RabbitMQ
+- Dump messages from RabbitMQ keeping body, routing key and headers
 - Load messages to RabbitMQ
-- Carefully keep a message routing key, body, headers
 - By default will not consume messages. Server state is not changed after dumping.
 - Dump all messages from whole RMQ server or specific vhost or a queue
 - Alter messages vhost or queue name during dump or load
 - Load from a dump only specified vhosts or queues
+- Declare needed queues at load if `--declare` option is used
 - Work with STDOUT and STDIN streams using json lines format
 - Dry run option
+- Supports Linux, MacOS, Windows. Installed php is needed
 
 To backup exchanges, queues and bindings use RMQ webinterface - use RMQ web interface or rabbitmqadmin for it.
 
