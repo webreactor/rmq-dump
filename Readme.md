@@ -92,15 +92,16 @@ Print help:
 Arguments:
   Full name    | Short | Default            | Note
 -------------------------------------------------------
-  --host         -H      localhost            
-  --port         -P      15672                
-  --binary-port  -B      5672                 
-  --user         -u                           
-  --pass         -p                           
+  --host         -H      localhost
+  --port         -P      15672
+  --binary-port  -B      5672
+  --user         -u
+  --pass         -p
   --vhost        -v                           vhost[:queue] | :queue
   --skip         -s                           vhost[:queue] | :queue
-  --alter        -a                           from_vhost[:queue]~to_vhost[:queue] | vhost[:queue]
-
+  --alter        -a                           vhost[:queue]~vhost[:queue] | vhost[:queue]
+  --ack          -k      false                acknowlege (delete) messages when dump
+  --declare      -d      false                declare persistent queues when load
 ```
 
 `--vhost` `--skip` `--alter` can be used miltiple times
