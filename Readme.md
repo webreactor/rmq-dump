@@ -20,7 +20,10 @@ To backup exchanges, queues and bindings use RMQ webinterface - use RMQ web inte
 
 Linux, MacOS:
 ```bash
-# You need installed php
+# php dependencies
+apt-get install php-cli php-curl php-mbstring php-bcmath
+
+# Download and install rmq-dump
 curl -L https://github.com/webreactor/rmq-dump/releases/download/0.0.4/rmq-dump > /usr/local/bin/rmq-dump
 chmod a+x /usr/local/bin/rmq-dump
 ```
